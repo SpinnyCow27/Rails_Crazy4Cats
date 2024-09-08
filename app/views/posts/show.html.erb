@@ -1,0 +1,55 @@
+<p style="color: green"><%= notice %></p>
+<div class="container">
+
+  <h1>Titular: <%= @post.title %></h1>
+  <p><b>Post:</b> <%= @post.content %></p>
+
+  <hr>
+
+  <h4>Reactions</h4>
+  <p>Likes: <%= @post.likes_count || 0 %> | Dislikes: <%= @post.dislikes_count || 0 %></p>
+
+  <div class="d-flex gap-2">
+    <% unless @post.reactions.find_by(user: current_user)&.kind == 'like' %>
+      <%= button_to 'Like', post_reactions_path(@post, kind: 'like'), method: :post, class: 'btn btn-success' %>
+    <% end %>
+
+    <% unless @post.reactions.find_by(user: current_user)&.kind == 'dislike' %>
+      <%= button_to 'Dislike', post_reactions_path(@post, kind: 'dislike'), method: :post, class: 'btn btn-danger' %>
+    <% end %>
+  </div>
+
+
+  <h3>Comments</h3>
+  <%= form_with model: [@post, @post.comments.build], local: true do |f| %>
+  <div class="mb-3">
+    <%= f.label :content %>
+    <%= f.text_area :content, class: 'form-control' %>
+  </div>
+
+  <div class="form-check mb-3">
+    <%= f.check_box :anonymous, class: 'form-check-input' %>
+    <%= f.label :anonymous, 'Comment as Anonymous', class: 'form-check-label' %>
+  </div>
+
+  <div class="actions">
+    <%= f.submit 'Add Comment', class: 'btn btn-primary' %>
+  </div>
+  <% end %>
+
+  <hr>
+
+  <h4>Existing Comments</h4>
+  <% @comments.each do |comment| %>
+  <div class="comment-box mb-3">
+    <strong><%= comment.anonymous? ? "Anonymous" : comment.user&.email || "Unknown User" %>:</strong>
+    <p><%= comment.content %></p>
+  </div>
+  <% end %>
+  
+
+  <%= link_to "Edit this post", edit_post_path(@post) %> |
+  <%= link_to "Back to posts", posts_path %>
+
+  <%= button_to "Destroy this post", @post, method: :delete %>
+</div>
